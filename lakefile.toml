@@ -1,0 +1,8 @@
+name = "Aoc"
+
+[[lean_exe]]
+name = "main"
+root = "Main"
+
+[[lean_lib]]
+name = "Aoc"
