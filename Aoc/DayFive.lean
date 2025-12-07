@@ -105,8 +105,6 @@ def IntervalTree.fromList : List (Nat × Nat) → IntervalTree :=
 def IntervalTree.countMembers : IntervalTree → Nat := 
   List.foldl (fun acc {lo, hi} => acc + (hi - lo + 1)) 0 ∘ IntervalTree.toList
 
-#eval (IntervalTree.fromList [(20, 25)] |>.countMembers)
-
 def parseInput (input : String) : (IntervalTree × Array Nat) := 
   match input.splitOn "\n\n" with 
   | intervals :: ids :: _ => 
@@ -125,10 +123,8 @@ def parseInput (input : String) : (IntervalTree × Array Nat) :=
 def countValidIds (tree : IntervalTree) (ids : Array Nat) : Nat := 
   ids.filter tree.member |>.size 
 
-def solution : IO Nat := do 
-  let input <- IO.FS.readFile "day_five.txt"
-  let (tree, _) := parseInput input 
-  pure tree.countMembers 
-
+def solution : IO Nat := do
+  IO.FS.readFile "day_five.txt"
+  |>.map $ IntervalTree.countMembers ∘ Prod.fst ∘ parseInput
 
 #eval solution
