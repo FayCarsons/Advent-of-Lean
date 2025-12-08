@@ -68,7 +68,7 @@ def IntervalTree.merge : IntervalTree → IntervalTree → IntervalTree
   let (int, right') := extractMin right 
   .node int left right'
 
-def IntervalTree.extractTouching (self : IntervalTree) (int : Interval)  : (List (Nat × Nat) × IntervalTree) := go self
+def IntervalTree.extractTouching (self : IntervalTree) (int : Interval)  : (List Interval × IntervalTree) := go self
   where 
     go self := 
       match self with
@@ -85,14 +85,14 @@ def IntervalTree.extractTouching (self : IntervalTree) (int : Interval)  : (List
         else
           let (foundL, left') := left.extractTouching int 
           let (foundR, right') := right.extractTouching int 
-          ( int'.toTuple :: foundL ++ foundR
+          ( int' :: foundL ++ foundR
           , left'.merge right'
           )
 
 def IntervalTree.insert (self : IntervalTree) (interval : Interval) : IntervalTree :=  
   let (touching, cleaned) := self.extractTouching interval
-  let newLo := (interval.lo :: touching.map (·.fst)).min? |>.get!
-  let newHi := (interval.hi :: touching.map (·.snd)).max? |>.get!
+  let newLo := (interval.lo :: touching.map (·.lo)).min? |>.get!
+  let newHi := (interval.hi :: touching.map (·.hi)).max? |>.get!
   cleaned.insertSimple $ Interval.mk newLo newHi
 
 def IntervalTree.toList : IntervalTree → List Interval 
@@ -120,11 +120,15 @@ def parseInput (input : String) : (IntervalTree × Array Nat) :=
       |>.mergeSort (·.lo <= ·.lo)
       |>.foldl IntervalTree.insert .empty
 
-def countValidIds (tree : IntervalTree) (ids : Array Nat) : Nat := 
-  ids.filter tree.member |>.size 
+def solve_1 (tree : IntervalTree) (xs : Array Nat) : Nat := 
+  xs.filter tree.member |>.size
+
+def solve_2 (tree : IntervalTree) : Nat := 
+  tree.countMembers
 
 def solution : IO Nat := do
-  IO.FS.readFile "day_five.txt"
-  |>.map $ IntervalTree.countMembers ∘ Prod.fst ∘ parseInput
+  let (t, nums) <- parseInput <$> IO.FS.readFile "day_five.txt"
+  -- pure $ solve_1 t nums 
+  pure $ solve_2 t
 
-#eval solution
+-- #eval solution
