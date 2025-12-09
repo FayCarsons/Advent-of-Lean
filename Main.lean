@@ -1,5 +1,4 @@
-import Aoc.DayThree
+import Aoc.DaySeven
 
 def Main : IO Unit := 
-  solution >>= (println! ·)
-
+  pure ()
